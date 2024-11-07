@@ -6,6 +6,9 @@
 //! computed once during `init` and otherwise has no bearing on what
 //! computation is done to display the prompt.
 
+// Ideally remove this once we have config files
+#![allow(dead_code)]
+
 use std::fmt;
 use std::fmt::Write;
 

@@ -32,7 +32,7 @@ impl DataSource {
 }
 
 // label, prepath, info, postpath
-fn fill_git_vars(base: usize, psvars: &mut Vec<String>) {
+fn fill_git_vars(base: usize, psvars: &mut [String]) {
     let Ok(repo) =
         Repository::open_ext(".", RepositoryOpenFlags::CROSS_FS, std::env::var_os("HOME"))
     else {
@@ -48,7 +48,7 @@ fn fill_git_vars(base: usize, psvars: &mut Vec<String>) {
     let cwd = std::env::current_dir().unwrap();
     let rest = cwd.strip_prefix(root).unwrap_or(std::path::Path::new(""));
     psvars[base + 1] = format!("{}", root.display());
-    psvars[base + 3] = format!("{}", rest.display());
+    psvars[base + 3] = format!("/{}", rest.display());
     // Do we have a head
     let (head, code): (String, Oid) = if let Ok(head) = repo.head() {
         (

@@ -1,5 +1,7 @@
 //! Implementation of data sources
 
+use std::path::Path;
+
 use git2::{Oid, Repository, RepositoryOpenFlags, StatusOptions};
 
 use crate::config::DataSource;
@@ -41,12 +43,16 @@ fn fill_git_vars(base: usize, psvars: &mut [String]) {
     // Okay we definitely found a git repo
     psvars[base] = "git".into();
     // Split PWD into before repo and after repo
-    let mut root = repo.path();
+    let mut root = repo.path().to_owned();
     if root.ends_with(".git/") {
-        root = root.parent().unwrap();
+        root = root.parent().unwrap().to_owned();
     }
     let cwd = std::env::current_dir().unwrap();
-    let rest = cwd.strip_prefix(root).unwrap_or(std::path::Path::new(""));
+    let rest = cwd.strip_prefix(&root).unwrap_or(Path::new(""));
+    let home = std::env::var_os("HOME").unwrap_or("!!".into());
+    if let Ok(stuff) = root.strip_prefix(home) {
+        root = Path::new("~").join(stuff);
+    }
     psvars[base + 1] = format!("{}", root.display());
     psvars[base + 3] = format!("/{}", rest.display());
     // Do we have a head

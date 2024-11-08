@@ -132,7 +132,33 @@ fn calc_sudo() -> String {
     String::new()
 }
 fn calc_rust() -> String {
-    String::new()
+    if find_upwards("Cargo.toml").is_some() {
+        fn calc_label() -> Option<String> {
+            let mut prog = std::process::Command::new("rustup");
+            prog.args(["show", "active-toolchain"]);
+            let out = prog.output().ok()?;
+            let chain = std::str::from_utf8(&out.stdout).ok()?;
+            if let Some((chain, _)) = chain.split_once(' ') {
+                if chain.starts_with("stable-") {
+                    Some("🦀🏠".into())
+                } else if chain.starts_with("beta-") {
+                    Some("🦀β".into())
+                } else if chain.starts_with("nightly-") {
+                    Some("🦀🌙".into())
+                } else {
+                    Some(format!(
+                        "🦀{}",
+                        chain.split_once('-').map(|(s, _)| s).unwrap_or(chain)
+                    ))
+                }
+            } else {
+                None
+            }
+        }
+        calc_label().unwrap_or_default()
+    } else {
+        String::new()
+    }
 }
 fn calc_key() -> String {
     String::new()

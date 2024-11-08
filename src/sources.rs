@@ -129,7 +129,17 @@ fn fill_git_vars(base: usize, psvars: &mut [String]) {
 }
 
 fn calc_sudo() -> String {
-    String::new()
+    fn calc_label() -> Option<String> {
+        let mut prog = std::process::Command::new("sudo");
+        prog.args(["-n", "-v"]);
+        let out = prog.output().ok()?;
+        if out.status.success() {
+            Some("yes".into())
+        } else {
+            None
+        }
+    }
+    calc_label().unwrap_or_default()
 }
 fn calc_rust() -> String {
     if find_upwards("Cargo.toml").is_some() {

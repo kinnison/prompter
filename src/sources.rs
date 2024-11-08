@@ -1,6 +1,6 @@
 //! Implementation of data sources
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use git2::{Oid, Repository, RepositoryOpenFlags, StatusOptions};
 
@@ -138,5 +138,19 @@ fn calc_key() -> String {
     String::new()
 }
 fn calc_flake() -> String {
-    String::new()
+    if find_upwards("flake.nix").is_some() {
+        String::from("❄ ")
+    } else {
+        String::new()
+    }
+}
+
+fn find_upwards(stem: impl AsRef<Path>) -> Option<PathBuf> {
+    let stem = stem.as_ref();
+    let here = std::env::current_dir().unwrap();
+    let mut here = here.as_path();
+    while !std::fs::exists(here.join(stem)).ok()? {
+        here = here.parent()?;
+    }
+    Some(here.join(stem))
 }

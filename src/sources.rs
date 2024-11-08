@@ -149,7 +149,7 @@ fn find_upwards(stem: impl AsRef<Path>) -> Option<PathBuf> {
     let stem = stem.as_ref();
     let here = std::env::current_dir().unwrap();
     let mut here = here.as_path();
-    while !std::fs::exists(here.join(stem)).ok()? {
+    while std::fs::metadata(here.join(stem)).is_err() {
         here = here.parent()?;
     }
     Some(here.join(stem))

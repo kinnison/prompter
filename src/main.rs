@@ -9,16 +9,22 @@ fn main() {
     let config = config::Config::default();
     let cli = cli::Cli::parse();
     if matches!(cli.cmd, Some(Command::Init)) {
-        println!("prompter_precmd () {{");
         println!(
-            "    eval \"$({})\"",
-            std::env::current_exe().unwrap().display()
+            r#"
+__prompter_precmd () {{
+    eval "$({exe})"
+}}
+
+autoload -Uz add-zsh hook
+add-zsh-hook precmd __prompter_precmd
+
+PS1="{left_prompt}"
+PS2="{right_prompt}"
+"#,
+            exe = std::env::current_exe().unwrap().display(),
+            left_prompt = config.left_prompt(),
+            right_prompt = config.right_prompt()
         );
-        println!("}}");
-        println!("autoload -Uz add-zsh-hook");
-        println!("add-zsh-hook precmd prompter_precmd");
-        println!("PS1=\"{}\"", config.left_prompt());
-        println!("RPS1=\"{}\"", config.right_prompt());
     } else {
         for (i, v) in config.render().into_iter().enumerate().skip(1) {
             println!("psvar[{i}]={v:?}");

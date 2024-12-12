@@ -15,6 +15,7 @@ use std::fmt::Write;
 pub struct Config {
     pub left_prompt: Vec<PromptElement>,
     pub right_prompt: Vec<PromptElement>,
+    pub title: Vec<PromptElement>,
     pub sources: Vec<DataSource>,
 }
 
@@ -197,6 +198,29 @@ impl Default for Config {
                 ],
                 vec![Path],
             )],
+            title: vec![
+                Hostname,
+                Ternary(PsVarSet(1), vec![Lit('('), PsVar(1), Lit(')')], vec![]),
+                Ternary(
+                    PsVarSet(6),
+                    vec![Literal("(".into()), PsVar(6), Literal(")".into())],
+                    vec![],
+                ),
+                UserOrRoot,
+                Literal(" ".into()),
+                Ternary(
+                    PsVarSet(1),
+                    vec![
+                        PsVar(2),
+                        Lit('['),
+                        Ternary(PsVarSet(8), vec![PsVar(8), Lit(' ')], vec![]),
+                        PsVar(3),
+                        Lit(']'),
+                        PsVar(4),
+                    ],
+                    vec![Path],
+                ),
+            ],
             sources: vec![Git(1), Sudo(5), Rust(6), Key(7), Flake(8)],
         }
     }
@@ -204,18 +228,22 @@ impl Default for Config {
 
 impl Config {
     pub fn left_prompt(&self) -> String {
+        self.prep_prompt_parts(&self.left_prompt)
+    }
+    pub fn right_prompt(&self) -> String {
+        self.prep_prompt_parts(&self.right_prompt)
+    }
+
+    fn prep_prompt_parts(&self, parts: &[PromptElement]) -> String {
         let mut ret = String::new();
-        for e in &self.left_prompt {
+        for e in parts {
             write!(ret, "{e}").unwrap();
         }
         ret
     }
-    pub fn right_prompt(&self) -> String {
-        let mut ret = String::new();
-        for e in &self.right_prompt {
-            write!(ret, "{e}").unwrap();
-        }
-        ret
+
+    pub fn title(&self) -> String {
+        self.prep_prompt_parts(&self.title)
     }
 
     pub fn render(&self) -> Vec<String> {

@@ -27,7 +27,7 @@ add-zsh-hook precmd __prompter_precmd
 add-zsh-hook preexec __prompter_preexec
 
 PS1="{left_prompt}"
-PS2="{right_prompt}"
+RPS1="{right_prompt}"
 __prompter_title="{title}"
 "#,
             exe = std::env::current_exe().unwrap().display(),

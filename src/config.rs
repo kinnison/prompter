@@ -27,6 +27,7 @@ pub enum PromptElement {
     Path,
     UserOrRoot,
     LastExit,
+    ShLvl,
     Bold(Vec<PromptElement>),
     Underline(Vec<PromptElement>),
     Foreground(Colour, Vec<PromptElement>),
@@ -38,6 +39,7 @@ pub enum PromptElement {
 pub enum TernaryTest {
     PsVarSet(u8),
     ExitCode(u8),
+    ShLvlAtLeast(u8),
 }
 
 pub enum Colour {
@@ -96,6 +98,7 @@ impl fmt::Display for PromptElement {
             Path => write!(f, "%~"),
             UserOrRoot => write!(f, "%#"),
             LastExit => write!(f, "%?"),
+            ShLvl => write!(f, "%L"),
             Bold(rest) => Self::wrapped(f, "%B", "%b", rest),
             Underline(rest) => Self::wrapped(f, "%U", "%u", rest),
             Foreground(c, rest) => Self::wrapped(f, format!("%F{{{c}}}"), "%f", rest),
@@ -138,6 +141,7 @@ impl fmt::Display for TernaryTest {
         match self {
             PsVarSet(n) => write!(f, "{n}V"),
             ExitCode(n) => write!(f, "{n}?"),
+            ShLvlAtLeast(n) => write!(f, "{n}L"),
         }
     }
 }
@@ -166,11 +170,16 @@ impl Default for Config {
                     vec![Hostname],
                 ),
                 Ternary(
+                    ShLvlAtLeast(2),
+                    vec![Foreground(Blue, vec![Lit('('), ShLvl, Lit(')')])],
+                    vec![],
+                ),
+                Ternary(
                     PsVarSet(1),
-                    vec![Foreground(
+                    vec![Bold(vec![Foreground(
                         Blue,
                         vec![Literal("(".into()), PsVar(1), Literal(")".into())],
-                    )],
+                    )])],
                     vec![],
                 ),
                 Ternary(

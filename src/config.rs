@@ -57,6 +57,7 @@ pub enum DataSource {
     Git(usize),
     Sudo(usize),
     Rust(usize),
+    Direnv(usize),
     Key(usize),
     Flake(usize),
 }
@@ -230,7 +231,7 @@ impl Default for Config {
                     vec![Path],
                 ),
             ],
-            sources: vec![Git(1), Sudo(5), Rust(6), Key(7), Flake(8)],
+            sources: vec![Git(1), Sudo(5), Rust(6), Direnv(6), Key(7), Flake(8)],
         }
     }
 }

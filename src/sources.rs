@@ -13,6 +13,7 @@ impl DataSource {
             Git(base) => *base + 4,
             Sudo(n) => *n,
             Rust(n) => *n,
+            Direnv(n) => *n,
             Key(n) => *n,
             Flake(n) => *n,
         } + 1;
@@ -26,7 +27,8 @@ impl DataSource {
         match self {
             Git(base) => fill_git_vars(*base, psvars),
             Sudo(var) => psvars[*var] = calc_sudo(),
-            Rust(var) => psvars[*var] = calc_rust(),
+            Rust(var) => psvars[*var] = calc_rust(&psvars[*var]),
+            Direnv(var) => psvars[*var] = calc_direnv(&psvars[*var]),
             Key(var) => psvars[*var] = calc_key(),
             Flake(var) => psvars[*var] = calc_flake(),
         }
@@ -141,7 +143,7 @@ fn calc_sudo() -> String {
     }
     calc_label().unwrap_or_default()
 }
-fn calc_rust() -> String {
+fn calc_rust(prefix: &str) -> String {
     if find_upwards("Cargo.toml").is_some() {
         fn calc_label() -> Option<String> {
             let mut prog = std::process::Command::new("rustup");
@@ -165,9 +167,17 @@ fn calc_rust() -> String {
                 None
             }
         }
-        calc_label().unwrap_or_default()
+        format!("{prefix}{}", calc_label().unwrap_or_default())
     } else {
-        String::new()
+        prefix.into()
+    }
+}
+
+fn calc_direnv(prefix: &str) -> String {
+    if std::env::var_os("DIRENV_FILE").is_some() {
+        format!("{prefix}📂")
+    } else {
+        prefix.into()
     }
 }
 fn calc_key() -> String {

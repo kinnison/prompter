@@ -191,25 +191,29 @@ impl Default for Config {
                 UserOrRoot,
                 Literal(" ".into()),
             ],
-            right_prompt: vec![Ternary(
-                PsVarSet(1),
-                vec![
-                    PsVar(2),
-                    Foreground(
-                        Yellow,
-                        vec![
-                            Lit('['),
-                            Ternary(PsVarSet(8), vec![PsVar(8), Lit(' ')], vec![]),
-                            PsVar(3),
-                            Lit(']'),
-                        ],
-                    ),
-                    PsVar(4),
-                ],
-                vec![Path],
-            )],
+            right_prompt: vec![
+                Ternary(
+                    PsVarSet(1),
+                    vec![
+                        PsVar(2),
+                        Foreground(
+                            Yellow,
+                            vec![
+                                Lit('['),
+                                Ternary(PsVarSet(8), vec![PsVar(8), Lit(' ')], vec![]),
+                                PsVar(3),
+                                Lit(']'),
+                            ],
+                        ),
+                        PsVar(4),
+                    ],
+                    vec![Path],
+                ),
+                Ternary(PsVarSet(7), vec![PsVar(7)], vec![]),
+            ],
             title: vec![
                 Hostname,
+                Ternary(ShLvlAtLeast(2), vec![Lit('('), ShLvl, Lit(')')], vec![]),
                 Ternary(PsVarSet(1), vec![Lit('('), PsVar(1), Lit(')')], vec![]),
                 Ternary(
                     PsVarSet(6),
@@ -230,6 +234,7 @@ impl Default for Config {
                     ],
                     vec![Path],
                 ),
+                Ternary(PsVarSet(7), vec![PsVar(7)], vec![]),
             ],
             sources: vec![Git(1), Sudo(5), Rust(6), Direnv(6), Key(7), Flake(8)],
         }

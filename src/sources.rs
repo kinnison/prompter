@@ -1,6 +1,9 @@
 //! Implementation of data sources
 
-use std::path::{Path, PathBuf};
+use std::{
+    path::{Path, PathBuf},
+    process::Command,
+};
 
 use git2::{Oid, Repository, RepositoryOpenFlags, StatusOptions};
 
@@ -181,7 +184,20 @@ fn calc_direnv(prefix: &str) -> String {
     }
 }
 fn calc_key() -> String {
-    String::new()
+    fn gen() -> Result<String, Box<dyn std::error::Error>> {
+        if std::env::var_os("GNUPGHOME").is_none() {
+            return Ok(String::new());
+        }
+        let mut cmd = Command::new("gpg");
+        cmd.arg("--card-status");
+        let out = cmd.output()?;
+        if out.status.success() {
+            Ok(String::from("🔑"))
+        } else {
+            Ok(String::new())
+        }
+    }
+    gen().unwrap_or_default()
 }
 fn calc_flake() -> String {
     if find_upwards("flake.nix").is_some() {

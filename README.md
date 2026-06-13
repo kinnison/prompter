@@ -13,3 +13,11 @@ eval "$(prompter init)"
 The prompt system is designed to be both left-prompt and right-prompt and contains information
 about both sides. Eventually prompter will fork into the background to stay running, but
 for now it is invoked every time the prompt wishes to be displayed.
+
+To acquire this:
+
+`rad clone rad:z3bFN4wHmZ4dPSxUMTomYW276EVko`
+
+To use in a flake, the git URL is:
+
+`git+https://radicle.infrafish.uk/z3bFN4wHmZ4dPSxUMTomYW276EVko.git`
